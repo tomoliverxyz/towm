@@ -1,0 +1,11 @@
+# build files
+*.o
+*.rej
+*.diff
+*.orig
+
+# towm executable
+towm
+
+# config file created by make
+config.h
