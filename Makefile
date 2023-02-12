@@ -21,13 +21,14 @@ options:
 ${OBJ}: config.h config.mk
 
 config.h:
-	cp config.def.h $@
+	mkdir -p /etc/xdg/towm
+	cp config.def.h /etc/xdg/towm/towm.default.h
 
 towm: ${OBJ}
 	${CC} -o $@ ${OBJ} ${LDFLAGS}
 
 clean:
-	rm -f towm ${OBJ} towm-${VERSION}.tar.gz config.h
+	rm -f towm ${OBJ} towm-${VERSION}.tar.gz
 
 dist: clean
 	mkdir -p towm-${VERSION}
@@ -36,6 +37,12 @@ dist: clean
 	tar -cf towm-${VERSION}.tar towm-${VERSION}
 	gzip towm-${VERSION}.tar
 	rm -rf towm-${VERSION}
+
+setup:
+	rm -fr ${DESTDIR}${PREFIX}/share/towm
+	mkdir -p ${DESTDIR}${PREFIX}/share/towm
+	cp -R LICENSE Makefile README config.def.h config.mk\
+		towm.1 drw.h util.h ${SRC} transient.c ${DESTDIR}${PREFIX}/share/towm
 
 install: all
 	mkdir -p ${DESTDIR}${PREFIX}/bin
@@ -49,4 +56,4 @@ uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/towm\
 		${DESTDIR}${MANPREFIX}/man1/towm.1
 
-.PHONY: all options clean dist install uninstall
+.PHONY: all options clean dist setup install uninstall
