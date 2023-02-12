@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -269,7 +270,11 @@ static Monitor *mons, *selmon;
 static Window root, wmcheckwin;
 
 /* configuration, allows nested code to access above variables */
-#include "config.h"
+#if __has_include("towm.h")
+#include "towm.h"
+#else
+#include "towm.default.h"
+#endif
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
@@ -2167,10 +2172,16 @@ zoom(const Arg *arg)
 int
 main(int argc, char *argv[])
 {
-	if (argc == 2 && !strcmp("-v", argv[1]))
+	if (argc == 2 && !strcmp("-v", argv[1])) {
 		die("towm-"VERSION);
+	}
+	else if (argc == 2 && !strcmp("-c", argv[1])) {
+		system("cd /usr/local/share/towm && sudo make && sudo make install");
+		die("towm compiled successfully.");
+	}
 	else if (argc != 1)
-		die("usage: towm [-v]");
+		die("usage: towm [-v] [-c]");
+	
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())
 		fputs("warning: no locale support\n", stderr);
 	if (!(dpy = XOpenDisplay(NULL)))
