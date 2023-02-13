@@ -109,6 +109,7 @@ typedef struct {
 
 typedef struct {
 	const char *symbol;
+	const int enabled;
 	void (*arrange)(Monitor *);
 } Layout;
 
@@ -495,7 +496,7 @@ void
 cleanup(void)
 {
 	Arg a = {.ui = ~0};
-	Layout foo = { "", NULL };
+	Layout foo = { "", 1, NULL };
 	Monitor *m;
 	size_t i;
 
@@ -1547,10 +1548,9 @@ setfullscreen(Client *c, int fullscreen)
 void
 setlayout(const Arg *arg)
 {
-	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt])
-		selmon->sellt ^= 1;
 	if (arg && arg->v)
-		selmon->lt[selmon->sellt] = (Layout *)arg->v;
+		if (((Layout *)arg->v)->enabled == 1)
+			selmon->lt[selmon->sellt] = (Layout *)arg->v;
 	strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol, sizeof selmon->ltsymbol);
 	if (selmon->sel)
 		arrange(selmon);
